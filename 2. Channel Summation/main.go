@@ -16,6 +16,7 @@ func calculateSum(ch <-chan int, sumCh chan<- int)  {
 	sum := 0
 
 	for num := range ch{
+		fmt.Println("Current Num is ", num, " And ch size is ", len(ch))
 		sum += num
 	}
 

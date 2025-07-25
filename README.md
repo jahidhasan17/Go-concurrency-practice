@@ -14,3 +14,7 @@ Keep in mind -
     - Handle channel closing correctly
     - Use synchronization primitives like WaitGroups when needed
     - Consider edge cases and error handling
+
+# Some Concepts
+1. Channels are Passed by Value (But Have Reference-like Behavior)
+    * When you pass a channel to a function, Go makes a copy of the channel reference. So if we change the variable after call the method, the channel in the method doesn't affect.
