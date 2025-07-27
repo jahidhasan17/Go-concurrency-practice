@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -21,13 +24,25 @@ var (
 )
 
 func main() {
-	opts := mqtt.NewClientOptions()
-	var brokerAddress string = "p063f046.ala.asia-southeast1.emqxsl.com";
-    var brokerPort int = 8883;
+	err := godotenv.Load()
+    if err != nil {
+        fmt.Println("Warning: .env file not found, using system environment variables")
+    }
+
+    opts := mqtt.NewClientOptions()
+    var brokerAddress string = os.Getenv("MQTT_BROKER_ADDRESS")
+    brokerPortStr := os.Getenv("MQTT_BROKER_PORT")
+    if brokerPortStr == "" {
+        panic("MQTT_BROKER_PORT environment variable not set")
+    }
+    brokerPort, err := strconv.Atoi(brokerPortStr)
+    if err != nil {
+        panic(fmt.Sprintf("Invalid MQTT_BROKER_PORT: %v", err))
+    }
     opts.AddBroker(fmt.Sprintf("ssl://%s:%d", brokerAddress, brokerPort))
 	opts.SetClientID("go_mqtt_concurrent_client")
-	opts.SetUsername("jahid123")
-	opts.SetPassword("jahid123")
+	opts.SetUsername(os.Getenv("MQTT_USERNAME"))
+	opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
 	opts.SetDefaultPublishHandler(messagePubHandler)
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
