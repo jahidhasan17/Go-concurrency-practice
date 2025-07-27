@@ -1,4 +1,4 @@
-# Goroutine concurrency practice
+# Go concurrency practice
 
 A curated set of Go concurrency exercises designed to help you master goroutines, channels, and synchronization primitives. Each folder contains a focused problem, sample code, and explanations to reinforce key concepts in concurrent programming.
 
