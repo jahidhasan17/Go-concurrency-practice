@@ -4,17 +4,17 @@ A curated set of Go concurrency exercises designed to help you master goroutines
 
 ## What’s Inside
 
-- [**Basic Goroutine Communication**](./Basic-Goroutine-Communication/README.md): Learn how to send and receive data between goroutines using channels.
-- [**Channel Summation**](./Channel-Summation/README.md): Generate numbers and sum them concurrently.
-- [**Multiple Workers**](./Multiple-Workers/README.md): Distribute tasks among multiple worker goroutines.
-- [**Prime Number Sieve**](./Prime-Number-Sieve/README.md): Implement the Sieve of Eratosthenes using goroutines and channels.
-- [**Timeout Handling**](./Timeout-Handling/README.md): Use channels and timeouts to handle slow operations.
-- [**Fan-out/Fan-in**](./Fan-out-Fan-in/README.md): Process data with multiple workers and merge results.
-- [**Rate Limiter**](./Rate-Limiter/README.md): Control the rate of operations using a token bucket pattern.
-- [**Concurrent Web Crawler**](./Concurrent-Web-Crawler/README.md): Simulate a web crawler with limited concurrency.
-- [**Pub/Sub System**](./Pub-Sub-System/README.md): Build a simple publish-subscribe system using channels.
-- [**Concurrent Merge Sort**](./Concurrent-Merge-Sort/README.md): Sort data concurrently using merge sort and channels.
-- [**MQTT Example**](./MQTT-Example/README.md): Demonstrates concurrent publish/subscribe using MQTT protocol.
+- [**Basic Goroutine Communication**](./1.%20Basic%20Goroutine%20Communication): Learn how to send and receive data between goroutines using channels.
+- [**Channel Summation**](./2.%20Channel%20Summation): Generate numbers and sum them concurrently.
+- [**Multiple Workers**](./3.%20Multiple%20Workers): Distribute tasks among multiple worker goroutines.
+- [**Prime Number Sieve**](./4.%20Prime%20Number%20Sieve): Implement the Sieve of Eratosthenes using goroutines and channels.
+- [**Timeout Handling**](./5.%20Timeout%20Handling): Use channels and timeouts to handle slow operations.
+- [**Fan-out/Fan-in**](./6.%20Fan-out-Fan-in): Process data with multiple workers and merge results.
+- [**Rate Limiter**](./7.%20Rate%20Limiter): Control the rate of operations using a token bucket pattern.
+- [**Concurrent Web Crawler**](./8.%20Concurrent%20Web%20Crawler): Simulate a web crawler with limited concurrency.
+- [**Pub/Sub System**](./9.%20PubSub%20System): Build a simple publish-subscribe system using channels.
+- [**Concurrent Merge Sort**](./10.%20Concurrent%20Merge%20Sort): Sort data concurrently using merge sort and channels.
+- [**MQTT Example**](./MQTT): Demonstrates concurrent publish/subscribe using MQTT protocol.
 
 ## How to Use
 
