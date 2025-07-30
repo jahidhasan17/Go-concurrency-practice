@@ -3,8 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"strconv"
-	"sync"
+	"syscall"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -12,9 +13,6 @@ import (
 )
 
 var (
-	messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-		fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
-	}
 	connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 		fmt.Println("Connected")
 	}
@@ -22,6 +20,28 @@ var (
 		fmt.Printf("Connection lost: %v\n", err)
 	}
 )
+
+type MQTTMessage struct {
+	Topic   string
+	Payload []byte
+}
+
+func messageHandler(msgChan chan<- MQTTMessage) mqtt.MessageHandler {
+	return func(client mqtt.Client, msg mqtt.Message) {
+		msgChan <- MQTTMessage{
+			Topic:   msg.Topic(),
+			Payload: msg.Payload(),
+		}
+	}
+}
+
+func worker(id int, msgChan <-chan MQTTMessage) {
+	for msg := range msgChan {
+		fmt.Printf("Worker %d processing: %s - %s\n", id, msg.Topic, string(msg.Payload))
+
+		time.Sleep(100 * time.Millisecond)
+	}
+}
 
 func main() {
 	err := godotenv.Load()
@@ -43,7 +63,14 @@ func main() {
 	opts.SetClientID("go_mqtt_concurrent_client")
 	opts.SetUsername(os.Getenv("MQTT_USERNAME"))
 	opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
-	opts.SetDefaultPublishHandler(messagePubHandler)
+
+	msgChan := make(chan MQTTMessage, 100)
+
+	for i := 0; i < 5; i++ {
+		go worker(i, msgChan)
+	}
+
+	opts.SetDefaultPublishHandler(messageHandler(msgChan))
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 	opts.SetWill("topic/lwt", "Client disconnected unexpectedly", 1, true)
@@ -53,34 +80,21 @@ func main() {
 		panic(token.Error())
 	}
 
-	var wg sync.WaitGroup
+	defer client.Disconnect(250)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		subscribeConcurrently(client, "topic/test")
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		publishConcurrently(client, "topic/test", 5)
-	}()
-
-	wg.Wait()
-
-	client.Disconnect(10000)
-	fmt.Println("Disconnected")
-}
-
-func subscribeConcurrently(client mqtt.Client, topic string) {
-	token := client.Subscribe(topic, 1, nil)
-	if token.Wait() && token.Error() != nil {
-		fmt.Printf("Subscribe error: %v\n", token.Error())
-		return
+	if token := client.Subscribe("topic/#", 1, nil); token.Wait() && token.Error() != nil {
+		panic(token.Error())
 	}
-	fmt.Printf("Subscribed to topic: %s\n", topic)
+
+	go func() {
+		publishConcurrently(client, "topic/test", 20)
+	}()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
 }
+
 
 func publishConcurrently(client mqtt.Client, topic string, count int) {
 	for i := 0; i < count; i++ {
@@ -91,6 +105,6 @@ func publishConcurrently(client mqtt.Client, topic string, count int) {
 			continue
 		}
 		fmt.Printf("Published: %s\n", msg)
-		time.Sleep(1 * time.Second)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
